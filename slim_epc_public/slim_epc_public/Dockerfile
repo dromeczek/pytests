@@ -1,3 +1,4 @@
+uv run pytest tests/test_api.py
 FROM 3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
