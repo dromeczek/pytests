@@ -9,3 +9,5 @@ epc_simulator.egg-info/SOURCES.txt
 epc_simulator.egg-info/dependency_links.txt
 epc_simulator.egg-info/requires.txt
 epc_simulator.egg-info/top_level.txt
+tests/test_api.py
+tests/test_models.py
