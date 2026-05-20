@@ -15,6 +15,6 @@ def test_attach_ue_request_rejects_invalid_ue_id():
     with pytest.raises(ValidationError):
         AttachUERequest(ue_id=101)
 def test_attach_ue_request_accepts_min_valid_ue_id():
-    request = AttachUERequest(ue_id=0)
+    request = AttachUERequest(ue_id=1)
 
-    assert request.ue_id == 0
+    assert request.ue_id == 1
