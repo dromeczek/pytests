@@ -41,7 +41,7 @@ def get_ues_stats(
     include_details: bool = False,
 ):
     if ue_id is not None and not repo.ue_exists(ue_id):
-        raise HTTPException(status_code=400, detail="UE not found")
+        raise HTTPException(status_code=404, detail="UE not found") #zmina na odpowiedni kod
     ues = [ue_id] if ue_id is not None else list(repo.list_ues())
     total_tx = 0
     total_rx = 0
@@ -53,7 +53,7 @@ def get_ues_stats(
             state = repo.get_ue(uid)
         except ValueError:
             if ue_id is not None:
-                raise HTTPException(status_code=400, detail="UE not found")
+                raise HTTPException(status_code=404, detail="UE not found") #zmiana na odpowiedni kod
             continue
         for b_id, stats in state.stats.items():
             end_ts = time.time() if (stats.start_ts and tm.is_running(uid, b_id)) else stats.last_update_ts
