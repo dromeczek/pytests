@@ -20,7 +20,7 @@ class ThroughputStats(BaseModel):
 
 
 class UEState(BaseModel):
-    ue_id: int = Field(ge=1, le=100)
+    ue_id: int = Field(ge=0, le=100)
     bearers: dict[int, BearerConfig] = {}
     stats: dict[int, ThroughputStats] = {}
 
@@ -35,7 +35,7 @@ class UEState(BaseModel):
 
 # Request body schemas (REST API)
 class AttachUERequest(BaseModel):
-    ue_id: int = Field(ge=1, le=100)
+    ue_id: int = Field(ge=0, le=100)
 
 
 class AddBearerRequest(BaseModel):
@@ -49,10 +49,24 @@ class StartTrafficRequest(BaseModel):
     bps: float | None = None
 
     @model_validator(mode="after")
-    def exactly_one_throughput(self):
+    def validate_throughput(self):
+        # 1. Sprawdzenie czy podano dokładnie jedną jednostkę
         provided = [v for v in [self.Mbps, self.kbps, self.bps] if v is not None]
         if len(provided) != 1:
             raise ValueError("Provide exactly one throughput value (Mbps, kbps, or bps)")
+        
+        # 2. Sprawdzenie limitu 100 Mbps (czyli 100 000 000 bps)
+        target = 0
+        if self.Mbps is not None:
+            target = self.Mbps * 1_000_000
+        elif self.kbps is not None:
+            target = self.kbps * 1_000
+        elif self.bps is not None:
+            target = self.bps
+            
+        if target > 100_000_000:
+            raise ValueError("Throughput cannot exceed max 100 Mbps")
+            
         return self
 
     def target_bps(self) -> int:
@@ -61,7 +75,6 @@ class StartTrafficRequest(BaseModel):
         if self.kbps is not None:
             return int(self.kbps * 1_000)
         return int(self.bps or 0)
-
 
 # Response Schemas
 class StatusResponse(BaseModel):

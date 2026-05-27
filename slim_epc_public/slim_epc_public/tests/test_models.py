@@ -62,8 +62,9 @@ def test_uestate_valid_ids():
 
 # Weryfikuje, czy obecny kod odrzuca identyfikatory UE poniżej 1 i powyżej 100.
 def test_uestate_invalid_ids():
+    # Zmieniamy 0 na -1, bo 0 jest już dozwolone
     with pytest.raises(ValidationError):
-        UEState(ue_id=0)
+        UEState(ue_id=-1)
     with pytest.raises(ValidationError):
         UEState(ue_id=101)
 
@@ -83,9 +84,13 @@ def test_uestate_init_defaults():
 
 # Sprawdza, czy endpoint podłączania UE akceptuje id 1 i odrzuca id 0 (zgodnie z aktualnie zdefiniowanymi limitami).
 def test_attach_ue_request_validation():
+    # Dodajmy też asercję sprawdzającą nowe zero!
+    assert AttachUERequest(ue_id=0).ue_id == 0
     assert AttachUERequest(ue_id=1).ue_id == 1
+    
+    # Zmieniamy 0 na -1
     with pytest.raises(ValidationError):
-        AttachUERequest(ue_id=0)
+        AttachUERequest(ue_id=-1)
 
 # Sprawdza, czy żądanie dodania bearera przestrzega maksymalnego limitu ID bearera (9).
 def test_add_bearer_request_validation():
