@@ -248,6 +248,28 @@ def get_traffic_stats(
     )
 
 
+@router.delete("/ues/{ue_id}/traffic", response_model=StatusResponse)
+def stop_all_ue_traffic(
+    ue_id: int,
+    repo: Annotated[EPCRepository, Depends(get_repo)],
+):
+    """Zatrzymuje ruch na wszystkich aktywnych bearerach przypisanych do konkretnego UE."""
+    try:
+        state = repo.get_ue(ue_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    tm = get_traffic_manager(repo)
+    
+    for bearer_id, bearer in state.bearers.items():
+        if tm.is_running(ue_id, bearer_id):
+            tm.stop(ue_id, bearer_id)
+            bearer.active = False
+            repo.update_bearer(ue_id, bearer)
+
+    return StatusResponse(status="all_traffic_stopped")
+
+
 # --- Reset ---
 
 @router.post("/reset", response_model=StatusResponse)
