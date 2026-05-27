@@ -20,7 +20,7 @@ class ThroughputStats(BaseModel):
 
 
 class UEState(BaseModel):
-    ue_id: int = Field(ge=1, le=100)
+    ue_id: int = Field(ge=0, le=100)#zmiana z 1 na 0
     bearers: dict[int, BearerConfig] = {}
     stats: dict[int, ThroughputStats] = {}
 
@@ -35,7 +35,7 @@ class UEState(BaseModel):
 
 # Request body schemas (REST API)
 class AttachUERequest(BaseModel):
-    ue_id: int = Field(ge=1, le=100)
+    ue_id: int = Field(ge=0, le=100)#zmiana z 1 na 0
 
 
 class AddBearerRequest(BaseModel):
