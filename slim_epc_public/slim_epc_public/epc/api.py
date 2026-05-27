@@ -104,7 +104,7 @@ def detach_ue(ue_id: int, repo: Annotated[EPCRepository, Depends(get_repo)]):
     try:
         repo.detach_ue(ue_id)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))#zmiana z 400 na 404 w przypadku nie nzaleziienia ue
     return DetachResponse(status="detached", ue_id=ue_id)
 
 
