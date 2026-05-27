@@ -128,3 +128,23 @@ def test_get_aggregated_stats():
     data = response.json()
     assert data["scope"] == "all"
     assert data["ue_count"] == 1
+
+
+def test_stop_all_traffic_for_ue():
+    """Weryfikacja zatrzymania ruchu dla całego UE (wszystkich bearerów naraz)."""
+    # 1. Setup: podłączamy UE
+    client.post("/ues", json={"ue_id": 1})
+    
+    # 2. Dodajemy dodatkowy bearer (bearer 9 jest dodawany automatycznie)
+    client.post("/ues/1/bearers", json={"bearer_id": 2})
+    
+    # 3. Uruchamiamy ruch na obu bearerach
+    client.post("/ues/1/bearers/9/traffic", json={"protocol": "udp", "Mbps": 5})
+    client.post("/ues/1/bearers/2/traffic", json={"protocol": "tcp", "Mbps": 10})
+    
+    # 4. Akcja: zatrzymujemy cały ruch dla tego UE jednym żądaniem
+    response = client.delete("/ues/1/traffic")
+    
+    # 5. Weryfikacja: sprawdzamy czy endpoint zwrócił poprawny status
+    assert response.status_code == 200
+    assert response.json() == {"status": "all_traffic_stopped"}
