@@ -154,6 +154,9 @@ def start_traffic(
     body: StartTrafficRequest,
     repo: Annotated[EPCRepository, Depends(get_repo)],
 ):
+    if body is None:
+        raise HTTPException(status_code=422, detail="No valid body received")
+
     target_bps = body.target_bps()
     try:
         state = repo.get_ue(ue_id)

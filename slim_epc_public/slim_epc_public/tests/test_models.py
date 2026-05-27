@@ -82,13 +82,11 @@ def test_uestate_init_defaults():
 
 # --- Testy dla żądań (Requests) ---
 
-# Sprawdza, czy endpoint podłączania UE akceptuje id 1 i odrzuca id 0 (zgodnie z aktualnie zdefiniowanymi limitami).
+# Sprawdza, czy endpoint podłączania UE akceptuje id 1
 def test_attach_ue_request_validation():
     # Dodajmy też asercję sprawdzającą nowe zero!
     assert AttachUERequest(ue_id=0).ue_id == 0
     assert AttachUERequest(ue_id=1).ue_id == 1
-    
-    # Zmieniamy 0 na -1
     with pytest.raises(ValidationError):
         AttachUERequest(ue_id=-1)
 

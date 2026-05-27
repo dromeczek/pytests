@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ValidationError
 
 
 class BearerConfig(BaseModel):
@@ -68,6 +68,23 @@ class StartTrafficRequest(BaseModel):
             raise ValueError("Throughput cannot exceed max 100 Mbps")
             
         return self
+
+    @model_validator(mode="after")
+    def max_100_mbps(self):
+        if (self.Mbps is not None and self.Mbps > 100) \
+        or (self.kbps is not None and self.kbps > 100000) \
+        or (self.bps is not None and self.bps > 100000000):
+            raise ValidationError.from_exception_data(
+                title=StartTrafficRequest.__name__,
+                line_errors=[
+                    {
+                        "type": "value_error",
+                        "loc": ("name",),
+                        "input": "X",
+                        "ctx": {"error": "max 100 Mbps"},
+                    }
+                ],
+            )
 
     def target_bps(self) -> int:
         if self.Mbps is not None:

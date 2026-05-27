@@ -22,7 +22,7 @@ def test_attach_ue_endpoint_valid_ids(ue_id):
     assert response.json() == {"status": "attached", "ue_id": ue_id}
 
 
-@pytest.mark.parametrize("ue_id", [0, 101, -1])
+@pytest.mark.parametrize("ue_id", [101, -1])
 def test_attach_ue_endpoint_invalid_ids(ue_id):
     """Weryfikacja odrzucenia ID spoza zakresu (FastAPI/Pydantic zwraca status 422 Unprocessable Entity)."""
     response = client.post("/ues", json={"ue_id": ue_id})
